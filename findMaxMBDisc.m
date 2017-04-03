@@ -106,7 +106,7 @@ function [incrMB, incbMB, stepRadius] = findMaxMBDisc(luminance,monitor,plot,run
     incbMB = bRadius./stepRadius;
     
     if plot
-        MakeMBspace(luminance,origin(1)-rRadius:incrMB:origin(1)+rRadius,origin(2)-bRadius:incbMB:origin(2)+bRadius,monitor)
+        MakeMBspace(luminance,monitor,origin(1)-rRadius:incrMB:origin(1)+rRadius,origin(2)-bRadius:incbMB:origin(2)+bRadius)
     end
     
     

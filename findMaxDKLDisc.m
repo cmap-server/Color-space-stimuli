@@ -17,12 +17,13 @@ function [incDKLX, incDKLY, origin, luminance, stepRadius] = findMaxDKLDisc(back
     stepRadius = refreshRate*(runTime/2); %runtime is time out to color and back. radius is frames out to color.
     
     if strcmp(monitor,'cemnl')
-        
         load extras/phosphors_cemnl
         load extras/scaling_cemnl     %load scaling which matches Boehm et. al 2014.
     elseif strcmp(monitor,'fMRI')
         load extras/phosphors_fMRI_monitor
-        load extras/scaling_fMRI_monitor     %load scaling which matches Boehm et. al 2014.    
+        load extras/scaling_fMRI_monitor     %load scaling which matches Boehm et. al 2014.  
+%         load extras/scaling_cemnl     %load scaling which matches Boehm et. al 2014.
+
     end
 
     load extras/SMJfundamentals
@@ -60,7 +61,9 @@ function [incDKLX, incDKLY, origin, luminance, stepRadius] = findMaxDKLDisc(back
         X = origin(1);
         YtoTry = linspace(origin(2),origin(2)+.5,100); %origin(2) + .5 was experimentally found to fail, and be close to passing
         incDKLY = (YtoTry(end)-origin(2))/100;
+        count = 0;
         for Y = YtoTry
+            count = count + 1;
             DKL_coords = [X, Y, luminance];
             lms = cartDKL2lms(DKL_coords,my_scaling');
             RGB = lms2rgb(phosphors,fundamentals,lms);
@@ -76,8 +79,8 @@ function [incDKLX, incDKLY, origin, luminance, stepRadius] = findMaxDKLDisc(back
             end
             
         end
-        Yradius = ((Y-incDKLY)- origin(2));
-        incDKLY = (Yradius/60);
+        YRadius = ((Y-incDKLY)- origin(2));
+        incDKLY = (YRadius/60);
         
         Y = origin(2);
         XtoTry =  linspace(origin(1),origin(1)+.06,100); %origin(1) + .06 was experimentally found to fail, and be close to passing
@@ -123,8 +126,8 @@ function [incDKLX, incDKLY, origin, luminance, stepRadius] = findMaxDKLDisc(back
             end
             
         end
-        Yradius = ((Y-incDKLY)- origin(2));
-        incDKLY = (Yradius/60);
+        YRadius = ((Y-incDKLY)- origin(2));
+        incDKLY = (YRadius/60);
         
         Y = origin(2);
         XtoTry =  linspace(origin(1),origin(1)+.04,100); %origin(1) + .04 was experimentally found to fail, and be close to passing
@@ -150,54 +153,54 @@ function [incDKLX, incDKLY, origin, luminance, stepRadius] = findMaxDKLDisc(back
         incDKLX = (Xradius/60);
     end
     
+        
+    thetaInc = 1; %degrees
     
+    %Now we decrease the radius from the initial guess until we find a
+    %radius where all points tested along the perimeter,at steps of 1 deg
+    %of angle, pass the validity test in rgb coords. 
+    count = 0;
+    for radius = 60:-1:0
+        count = count + 1;
+        saveRadius = radius;
+        count1 = 0;
+        broken = 0;
+        for theta = 0:thetaInc:360
+            count1 = count1 + 1;
+            [DKLX, DKLY] = polar2DKL(radius,theta,incDKLX,incDKLY,origin);
+            DKL_coords = [DKLX, DKLY, luminance];
+            lms = cartDKL2lms(DKL_coords,my_scaling');
+            RGB = lms2rgb(phosphors,fundamentals,lms);
+            %gamma table not needed for fMRI, which is pre-linearized
+            if ~strcmp(monitor,'fMRI')
+                try
+                    RGB = linearizeOutput(RGB,gammaTable);
+                catch
+                    broken = 1; %break if any color is invalid, return to loop and decrease value
+                    break
+                end
+            end
+            if(any(RGB(:)>255) || any(RGB(:)<0))
+                broken = 1; %break if any color is invalid, return to loop and decrease value
+                break
+            end
+        end
+        if broken ==0 %if not broken, all points are valid so break and save info
+            break
+        end      
+    end
+        
+    saveRadius;
     
-%     
-%     
-%     thetaInc = 1; %degrees
-%     
-%     %Now we decrease the radius from the initial guess until we find a
-%     %radius where all points tested along the perimeter,at steps of 1 deg
-%     %of angle, pass the validity test in rgb coords. 
-%     count = 0;
-%     for radius = 1:-Yinc:0
-%         count = count + 1;
-%         saveRadius = radius;
-%         count1 = 0;
-%         broken = 0;
-%         for theta = 0:thetaInc:360
-%             count1 = count1 + 1;
-%             [DKLX, DKLY] = polar2DKL(radius,theta,incDKLX,incDKLY,origin);
-%             DKL_coords = [DKLX, DKLY, luminance];
-%             lms = cartDKL2lms(DKL_coords,my_scaling');
-%             RGB = lms2rgb(phosphors,fundamentals,lms);
-%             %gamma table not needed for fMRI, which is pre-linearized
-%             if ~strcmp(monitor,'fMRI')
-%                 try
-%                     RGB = linearizeOutput(RGB,gammaTable);
-%                 catch
-%                     broken = 1; %break if any color is invalid, return to loop and decrease value
-%                     break
-%                 end
-%             end
-%             if(any(RGB(:)>255) || any(RGB(:)<0))
-%                 broken = 1; %break if any color is invalid, return to loop and decrease value
-%                 break
-%             end
-%         end
-%         if broken ==0 %if not broken, all points are valid so break and save info
-%             break
-%         end      
-%     end
-%         
-%     XRadius = saveRadius*incDKLX;
-%     Yradius = saveRadius*incDKLY;
-%     %Get radius in right number of steps and update increments accordingly
-%     incDKLX = XRadius./stepRadius;
-%     incDKLY = Yradius./stepRadius;
+    XRadius = saveRadius*incDKLX;
+    YRadius = saveRadius*incDKLY;
+    
+    %update increments according to stepRadius and new x,y radii
+    incDKLX = XRadius./stepRadius;
+    incDKLY = YRadius./stepRadius;
 
-    DKLX = origin(1)-Xradius:incDKLX:origin(1)+Xradius;
-    DKLY = origin(2)-Yradius:incDKLY:origin(2)+Yradius;
+    DKLX = origin(1)-XRadius:incDKLX:origin(1)+XRadius;
+    DKLY = origin(2)-YRadius:incDKLY:origin(2)+YRadius;
     
     if plot
         img = MakeDKLspace(background_grey,monitor,DKLX,DKLY);

@@ -13,7 +13,7 @@ if ~strcmp(monitor,'fMRI')
 end
 showOnlyValidColors = 1; %one to make non-valid colors black
 showOnlyDisc = 1; %one to black out points outside of disc
-showOnlyAnnulus = 0; %one to black out points inside a thin annulus
+showOnlyAnnulus = 1; %one to black out points inside a thin annulus
 
 %-------------------------------------------------------------------------%
 if strcmp(monitor,'cemnl')
@@ -22,7 +22,9 @@ if strcmp(monitor,'cemnl')
     load extras/gammaTableLabPC
 elseif strcmp(monitor,'fMRI')
     load extras/phosphors_fMRI_monitor
-    load extras/scaling_fMRI_monitor
+        load extras/scaling_fMRI_monitor
+%     load extras/scaling_cemnl
+    
 end
 
 load extras/SMJfundamentals

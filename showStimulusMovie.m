@@ -7,7 +7,7 @@ anglePair = [45 225];
 doubleFirstColorRuns = 1; %1 to display first color twice as many times as second color
 
 
-try
+% try
     Screen('Preference', 'SkipSyncTests', 1);
     ifis=1; %each coded frame lasts for 1 frame
     device = -3;
@@ -133,8 +133,8 @@ try
             break
         end
     end
-    sca
-
-catch
-sca;
-end
+%     sca
+% 
+% catch
+% sca;
+% end
