@@ -1,7 +1,7 @@
 
 
 %analyzing DKL color similarity data
-load('experimental_data_DKL_similarity\sub1_30-Mar-2017_17-46-58.mat')
+load('experimental_data_DKL_similarity/sub1_30-Mar-2017_17-46-58.mat')
 
 dissimilarity_sums = zeros(24,24);
 dissimilarity_counts = zeros(24,24); %should be 4 for every entry. check in case.
