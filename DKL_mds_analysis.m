@@ -68,7 +68,7 @@ rgb_dkl = rgb_dkl./255;
 
 %plot MDS solution
 figure
-subplot(2,1,1)
+% subplot(2,1,1)
 hold on
 for i = 1:24
 scat = scatter(solution(i,2),solution(i,1),200,rgb_dkl(i,:),'filled');
