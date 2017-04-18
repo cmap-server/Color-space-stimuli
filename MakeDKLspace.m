@@ -10,7 +10,9 @@ function img = MakeDKLspace(background_grey,monitor,DKLX,DKLY)
 gammaCorrect = 0;
 if ~strcmp(monitor,'fMRI')
     gammaCorrect = 1; %1 to gamma correct, 0 to not gamma correct.
+    load extras/gammaTableLabPC
 end
+
 showOnlyValidColors = 1; %one to make non-valid colors black
 showOnlyDisc = 1; %one to black out points outside of disc
 showOnlyAnnulus = 1; %one to black out points inside a thin annulus
@@ -19,7 +21,6 @@ showOnlyAnnulus = 1; %one to black out points inside a thin annulus
 if strcmp(monitor,'cemnl')
     load extras/phosphors_cemnl
     load extras/scaling_cemnl
-    load extras/gammaTableLabPC
 elseif strcmp(monitor,'fMRI')
     load extras/phosphors_fMRI_monitor
         load extras/scaling_fMRI_monitor

@@ -1,5 +1,5 @@
 
-function stimuli = generate_one_angle_nav_stimulus_DKL(theta,rho,gabor_angle,incDKLX,incDKLY,background_grey,monitor,phosphors,fundamentals,my_scaling,gamma_correct)
+function stimuli = generate_one_angle_nav_stimulus_DKL(theta,rho,gabor_angle,gabor_size_deg,phase_shift,incDKLX,incDKLY,background_grey,monitor,phosphors,fundamentals,my_scaling,gamma_correct,fullField)
 
 if gamma_correct
     %gamma correction only necessary for lab computer, not fMRI
@@ -23,7 +23,11 @@ for radius = 0:rho-1 %rho frames
     if gamma_correct
         RGB = linearizeOutput(RGB,gammaTable);
     end
-    stimuli(count,:,:,:) = colored_gabor(RGB,gabor_angle,6,monitor,0,'grey');
+    if fullField
+        stimuli(count,:,:,:) = fullfield_colored_gabor(RGB,gabor_angle,phase_shift,monitor,0,'grey');
+    else
+        stimuli(count,:,:,:) = colored_gabor(RGB,gabor_angle,gabor_size_deg,phase_shift,monitor,0,'grey');
+    end
 end
 
 end

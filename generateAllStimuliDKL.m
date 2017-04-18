@@ -7,6 +7,8 @@ clear all
 monitor = 'fMRI';
 stripeType = 'grey';
 runTime = 1; %seconds for out to one color and back, frame rate of 120 hz
+gabor_size_deg = 15;
+fullField = 1;
 
 if strcmp(monitor,'fMRI')
     load extras/phosphors_fMRI_monitor
@@ -19,19 +21,21 @@ elseif strcmp(monitor,'cemnl')
 end
 
 load extras/SMJfundamentals
+addpath('color_toolbox_v1')
     
 [incDKLX, incDKLY, origin, luminance, stepRadius] = findMaxDKLDisc(background_grey,monitor,1,1);
 
-for gabor_angle = [90 180]
-    if gabor_angle == 90
+
+for phase_shift = [0 1]
+    for gabor_angle = [90 180]
         for theta = 0:15:345
-            stimuli = generate_one_angle_nav_stimulus_DKL(theta,stepRadius,gabor_angle,incDKLX,incDKLY,background_grey,monitor,phosphors,fundamentals,my_scaling,0);
-            save(strcat(monitor,'_stimuli_DKL_6deg/','T',num2str(theta),'O',num2str(gabor_angle),'ST',stripeType,'shifted'),'stimuli');
-        end
-    else
-        for theta = 0:15:345
-            stimuli = generate_one_angle_nav_stimulus_DKL(theta,stepRadius,gabor_angle,incDKLX,incDKLY,background_grey,monitor,phosphors,fundamentals,my_scaling,0);
-            save(strcat(monitor,'_stimuli_DKL_6deg/','T',num2str(theta),'O',num2str(gabor_angle),'ST',stripeType,'shifted'),'stimuli');
+            stimuli = generate_one_angle_nav_stimulus_DKL(theta,stepRadius,gabor_angle,gabor_size_deg,phase_shift,incDKLX,incDKLY,background_grey,monitor,phosphors,fundamentals,my_scaling,0,fullField);
+            if phase_shift
+                fileName = strcat(monitor,'_stimuli_DKL_fullField/','T',num2str(theta),'O',num2str(gabor_angle),'ST',stripeType,'shifted');
+            else
+                fileName = strcat(monitor,'_stimuli_DKL_fullField/','T',num2str(theta),'O',num2str(gabor_angle),'ST',stripeType);
+            end
+            save(fileName,'stimuli')
         end
     end
 end

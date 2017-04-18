@@ -8,7 +8,7 @@
 %Updated 12/12/2016 with background_grey variable set in script to allow
 %for darker background grey, for fMRI experiment.
 
-function gabor_img = colored_gabor(RGB, orientation_deg,patch_size_deg,monitor,normalize,stripeType,MBluminance)
+function gabor_img = colored_gabor(RGB, orientation_deg,patch_size_deg,phase_shift,monitor,normalize,stripeType,MBluminance)
     %%
     %-------------------------------------------------------------------------%
     %Step 0 -- Set experimental conditions
@@ -55,7 +55,7 @@ function gabor_img = colored_gabor(RGB, orientation_deg,patch_size_deg,monitor,n
     background_grey = 128;
     contrast = 1;
     gabor_size_ang = patch_size_deg;
-    inner_r_ang = .015*gabor_size_ang; % deg, size of inner radius
+    inner_r_ang = .1; % deg, size of inner radius
     outer_r_ang = gabor_size_ang/2 - inner_r_ang; %deg, size of outer radius
     box_size_ang = gabor_size_ang + .1*gabor_size_ang; %Box is slightly bigger than gabor
 
@@ -85,7 +85,11 @@ function gabor_img = colored_gabor(RGB, orientation_deg,patch_size_deg,monitor,n
     lambda = sizex; %spatial wavelength
     amp = 1; %amplitude
     sigma = 10000; %decay constant for gaussian envelope. very large for no envelope.
-    phase = .75*lambda; %phase; initial offset of .25*lambda to center. adding .5*lambda flips stripes. 
+    if phase_shift
+        phase = .25*lambda; %phase; initial offset of .25*lambda to center. adding .5*lambda flips stripes. 
+    else
+        phase = .75*lambda; %phase; initial offset of .25*lambda to center. adding .5*lambda flips stripes. 
+    end
     show = 0; %display image
     prp = 0;
     gabor = Gabor_function( imSize, lambda, amp, theta, sigma, phase, show, prp);
@@ -126,6 +130,8 @@ function gabor_img = colored_gabor(RGB, orientation_deg,patch_size_deg,monitor,n
             end
         end
     end
+    
+    gabor(annulus) = 0;
     %%
     %-------------------------------------------------------------------------%
     %Step 3 -- color regions according to specs
@@ -195,6 +201,9 @@ function gabor_img = colored_gabor(RGB, orientation_deg,patch_size_deg,monitor,n
     else
         gabor_img = img;
     end
+    
+    gabor_img = uint8(gabor_img);
+    
 return
 
 %%

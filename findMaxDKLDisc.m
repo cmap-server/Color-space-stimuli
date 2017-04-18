@@ -1,12 +1,11 @@
 %
-%[incDKLX, incDKLY, origin, luminance, stepRadius] = findMaxDKLDisc(background_grey,monitor,plot,runTime)        
 
 %Code to find the maximum circular region of a given luminance. Finds a
 %first approximation radius, then draws a circle with n points at that
 %radius. Tests each point for RGB validity, and if a failure is found, the
 %radius is decremented. The process is repeated until all test points
 %pass. 
-%Copied from equivalent function for MB space for use with DKL space
+%Modified from equivalent function for MB space for use with DKL space
 %Updated 3/13/2017
 %Author: Nick Blauch
 
@@ -28,9 +27,12 @@ function [incDKLX, incDKLY, origin, luminance, stepRadius] = findMaxDKLDisc(back
 
     load extras/SMJfundamentals
     %gamma table not needed for fMRI, which is pre-linearized
-    if ~strcmp(monitor,'fMRI')
+    gammaCorrect = 0;
+    if ~strcmp(monitor,'fMRI') %fMRI monitor is auto gamma corrected
         load extras/gammaTableLabPC
+        gammaCorrect = 1;
     end
+    
 
     background_lms = rgb2lms(phosphors,fundamentals,repmat(background_grey,[3,1]));
     background_dkl = lms2cartDKL(background_lms,my_scaling');
@@ -67,7 +69,7 @@ function [incDKLX, incDKLY, origin, luminance, stepRadius] = findMaxDKLDisc(back
             DKL_coords = [X, Y, luminance];
             lms = cartDKL2lms(DKL_coords,my_scaling');
             RGB = lms2rgb(phosphors,fundamentals,lms);
-            if ~strcmp(monitor,'fMRI')
+            if gammaCorrect
                 try
                     RGB = linearizeOutput(RGB,gammaTable);
                 catch
@@ -90,7 +92,7 @@ function [incDKLX, incDKLY, origin, luminance, stepRadius] = findMaxDKLDisc(back
             DKL_coords = [X, Y, luminance];
             lms = cartDKL2lms(DKL_coords,my_scaling');
             RGB = lms2rgb(phosphors,fundamentals,lms);
-            if ~strcmp(monitor,'fMRI')
+            if gammaCorrect
                 try
                     RGB = linearizeOutput(RGB,gammaTable);
                 catch
@@ -114,7 +116,7 @@ function [incDKLX, incDKLY, origin, luminance, stepRadius] = findMaxDKLDisc(back
             DKL_coords = [X, Y, luminance];
             lms = cartDKL2lms(DKL_coords,my_scaling');
             RGB = lms2rgb(phosphors,fundamentals,lms);
-            if ~strcmp(monitor,'fMRI')
+            if gammaCorrect
                 try
                     RGB = linearizeOutput(RGB,gammaTable);
                 catch
@@ -137,7 +139,7 @@ function [incDKLX, incDKLY, origin, luminance, stepRadius] = findMaxDKLDisc(back
             DKL_coords = [X, Y, luminance];
             lms = cartDKL2lms(DKL_coords,my_scaling');
             RGB = lms2rgb(phosphors,fundamentals,lms);
-            if ~strcmp(monitor,'fMRI')
+            if gammaCorrect
                 try
                     RGB = linearizeOutput(RGB,gammaTable);
                 catch
@@ -172,7 +174,7 @@ function [incDKLX, incDKLY, origin, luminance, stepRadius] = findMaxDKLDisc(back
             lms = cartDKL2lms(DKL_coords,my_scaling');
             RGB = lms2rgb(phosphors,fundamentals,lms);
             %gamma table not needed for fMRI, which is pre-linearized
-            if ~strcmp(monitor,'fMRI')
+            if gammaCorrect
                 try
                     RGB = linearizeOutput(RGB,gammaTable);
                 catch
