@@ -17,19 +17,19 @@ function [incDKLX, incDKLY, origin, luminance, stepRadius] = findMaxDKLDisc(back
     stepRadius = refreshRate*(runTime/2); %runtime is time out to color and back. radius is frames out to color.
     
     if strcmp(monitor,'cemnl')
-        load extras/phosphors_cemnl
-        load extras/scaling_cemnl     %load scaling which matches Boehm et. al 2014.
+        load('/Volumes/SANDISK/UMass/CEMNL/Color space stimuli/extras/phosphors_cemnl')
+        load('/Volumes/SANDISK/UMass/CEMNL/Color space stimuli/extras/scaling_cemnl')     %load scaling which matches Boehm et. al 2014.
     elseif strcmp(monitor,'fMRI')
-        load extras/phosphors_fMRI_monitor
-        load extras/scaling_fMRI_monitor     %load scaling which matches Boehm et. al 2014.  
+        load('/Volumes/SANDISK/UMass/CEMNL/Color space stimuli/extras/phosphors_fMRI_monitor')
+        load('/Volumes/SANDISK/UMass/CEMNL/Color space stimuli/extras/scaling_fMRI_monitor')     %load scaling which matches Boehm et. al 2014.  
 %         load extras/scaling_cemnl     %load scaling which matches Boehm et. al 2014.
 
     end
 
-    load extras/SMJfundamentals
+    load('/Volumes/SANDISK/UMass/CEMNL/Color space stimuli/extras/SMJfundamentals')
     %gamma table not needed for fMRI, which is pre-linearized
     if ~strcmp(monitor,'fMRI')
-        load extras/gammaTableLabPC
+        load('/Volumes/SANDISK/UMass/CEMNL/Color space stimuli/extras/gammaTableLabPC')
     end
 
     background_lms = rgb2lms(phosphors,fundamentals,repmat(background_grey,[3,1]));

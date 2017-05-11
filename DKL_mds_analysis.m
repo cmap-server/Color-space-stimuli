@@ -1,8 +1,9 @@
 
+addpath('color_toolbox_v1')
 
 %analyzing DKL color similarity data
-load('experimental_data_DKL_similarity/sub1_30-Mar-2017_17-46-58.mat')
-
+load('/Volumes/SANDISK/UMass/CEMNL/Color space stimuli/experimental_data_DKL_similarity/sub2_10-Apr-2017_22-26-01')
+load('/Volumes/SANDISK/UMass/CEMNL/Color space stimuli/experimental_data_DKL_similarity/sub3_11-Apr-2017_18-19-55')
 dissimilarity_sums = zeros(24,24);
 dissimilarity_counts = zeros(24,24); %should be 4 for every entry. check in case.
 
