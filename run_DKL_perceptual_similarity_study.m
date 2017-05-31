@@ -145,6 +145,7 @@ load extras/gammaTableLabPC
  
     while(1)
         %Draw Textures
+        anglePair = randomAnglePairs(round(299*rand+1),:);
         
         color_1 = colors{anglePair(1)./15+1};
         color_2 = colors{anglePair(2)./15+1};
