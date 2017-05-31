@@ -1,4 +1,4 @@
-function [ gabor ] = make_gabor( imSize, lambda, amp, theta, sigma, phase, show, prp)
+function [ gabor ] = Gabor_function( imSize, lambda, amp, theta, sigma, phase, show, prp)
 % Purpose:
 %   Function to generate a gabor patch overlaid with visual white noise.
 %   Adapted from Matlab code provided by Freeman (2007)

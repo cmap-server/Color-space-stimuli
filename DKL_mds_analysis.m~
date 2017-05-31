@@ -1,12 +1,9 @@
 
-cd('/Volumes/SANDISK/UMass/CEMNL/Color space stimuli/')
 addpath('color_toolbox_v1')
 subject = 2;
 monitor = 'cemnl';
 
 dkl_coords = [cosd((0:23)*15); sind((0:23)*15)]';
-[dkl_angles, ~] = cart2pol(dkl_coords(:,1),dkl_coords(:,2));
-dkl_angles = wrapTo360(rad2deg(dkl_angles));
 
 if subject == 1 %CG
     load('/Volumes/SANDISK/UMass/CEMNL/Color space stimuli/experimental_data_DKL_similarity/sub1_30-Mar-2017_17-46-58')
@@ -124,7 +121,7 @@ figure
 hold on
 for i = 1:24
 scat = scatter(transformed_solution_procrustes(i,1),transformed_solution_procrustes(i,2),200,rgb_dkl(i,:),'filled');
-% scat2 = scatter(cosd((i-1)*15),sind((i-1)*15),200,rgb_dkl(i,:),'filled');
+scat2 = scatter(cosd((i-1)*15),sind((i-1)*15),200,rgb_dkl(i,:),'filled');
 end
 circ = plot(transformed_solution_procrustes(:,1),transformed_solution_procrustes(:,2),'black');
 axis equal

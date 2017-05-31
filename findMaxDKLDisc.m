@@ -10,26 +10,26 @@
 %Updated 3/13/2017
 %Author: Nick Blauch
 
-function [incDKLX, incDKLY, origin, luminance, stepRadius] = findMaxDKLDisc(background_grey,monitor,plot,runTime)        
+function [incDKLX, incDKLY, origin, luminance, stepRadius,xBroke,xBrokeRGB,yBroke,yBrokeRGB] = findMaxDKLDisc(background_grey,monitor,plot,runTime)        
     
 
     refreshRate = 120; %hz, standard.
     stepRadius = refreshRate*(runTime/2); %runtime is time out to color and back. radius is frames out to color.
     
     if strcmp(monitor,'cemnl')
-        load extras/phosphors_cemnl
-        load extras/scaling_cemnl     %load scaling which matches Boehm et. al 2014.
+        load('/Volumes/SANDISK/UMass/CEMNL/Color space stimuli/extras/phosphors_cemnl')
+        load('/Volumes/SANDISK/UMass/CEMNL/Color space stimuli/extras/scaling_cemnl')     %load scaling which matches Boehm et. al 2014.
     elseif strcmp(monitor,'fMRI')
-        load extras/phosphors_fMRI_monitor
-        load extras/scaling_fMRI_monitor     %load scaling which matches Boehm et. al 2014.  
+        load('/Volumes/SANDISK/UMass/CEMNL/Color space stimuli/extras/phosphors_fMRI_monitor')
+        load('/Volumes/SANDISK/UMass/CEMNL/Color space stimuli/extras/scaling_fMRI_monitor')     %load scaling which matches Boehm et. al 2014.  
 %         load extras/scaling_cemnl     %load scaling which matches Boehm et. al 2014.
 
     end
 
-    load extras/SMJfundamentals
+    load('/Volumes/SANDISK/UMass/CEMNL/Color space stimuli/extras/SMJfundamentals')
     %gamma table not needed for fMRI, which is pre-linearized
     if ~strcmp(monitor,'fMRI')
-        load extras/gammaTableLabPC
+        load('/Volumes/SANDISK/UMass/CEMNL/Color space stimuli/extras/gammaTableLabPC')
     end
 
     background_lms = rgb2lms(phosphors,fundamentals,repmat(background_grey,[3,1]));
@@ -53,14 +53,16 @@ function [incDKLX, incDKLY, origin, luminance, stepRadius] = findMaxDKLDisc(back
 
     %%
     %Here we find a first approximation of the maximum radius
-    %We test along the  y-axis, from origin to 2, and use the
+    %We test along the  y-axis, from origin to origin + 1, and use the
     %radius which produces the first invalid MB point.
     
-    if strcmp(monitor,'cemnl')
+%     if strcmp(monitor,'cemnl')
         
         X = origin(1);
-        YtoTry = linspace(origin(2),origin(2)+.5,100); %origin(2) + .5 was experimentally found to fail, and be close to passing
+        %we will try a range of Y values until an invalid point is reached
+        YtoTry = linspace(origin(2),origin(2)+1,100); %origin(2) + 1 is sufficiently large for full luminance range
         incDKLY = (YtoTry(end)-origin(2))/100;
+        yBroke  = 0;
         count = 0;
         for Y = YtoTry
             count = count + 1;
@@ -71,10 +73,14 @@ function [incDKLX, incDKLY, origin, luminance, stepRadius] = findMaxDKLDisc(back
                 try
                     RGB = linearizeOutput(RGB,gammaTable);
                 catch
+                    yBroke = 1;
+                    yBrokeRGB = RGB;
                     break
                 end
             end
             if(any(RGB(:)>255) || any(RGB(:)<0))
+                    yBroke = 1;
+                    yBrokeRGB = RGB;
                 break
             end
             
@@ -83,8 +89,9 @@ function [incDKLX, incDKLY, origin, luminance, stepRadius] = findMaxDKLDisc(back
         incDKLY = (YRadius/60);
         
         Y = origin(2);
-        XtoTry =  linspace(origin(1),origin(1)+.06,100); %origin(1) + .06 was experimentally found to fail, and be close to passing
+        XtoTry =  linspace(origin(1),origin(1)+.12,100); %origin(1) + .12 is sufficiently large for full luminance range
         incDKLX = (XtoTry(end) - origin(1))/100;
+        xBroke = 0;
         
         for X = XtoTry
             DKL_coords = [X, Y, luminance];
@@ -94,65 +101,20 @@ function [incDKLX, incDKLY, origin, luminance, stepRadius] = findMaxDKLDisc(back
                 try
                     RGB = linearizeOutput(RGB,gammaTable);
                 catch
+                    xBroke = 1;
+                    xBrokeRGB = RGB;
                     break
                 end
             end
             if(any(RGB(:)>255) || any(RGB(:)<0))
+                xBroke = 1;
+                xBrokeRGB = RGB;
                 break
             end
             
         end
         Xradius = (X-incDKLX- origin(1));
         incDKLX = (Xradius/60);
-    
-    elseif strcmp(monitor,'fMRI')
-        
-        X = origin(1);
-        YtoTry = linspace(origin(2),origin(2)+.5,100); %origin(2) + .5 was experimentally found to fail, and be close to passing
-        incDKLY = (YtoTry(end)-origin(2))/100;
-        for Y = YtoTry
-            DKL_coords = [X, Y, luminance];
-            lms = cartDKL2lms(DKL_coords,my_scaling');
-            RGB = lms2rgb(phosphors,fundamentals,lms);
-            if ~strcmp(monitor,'fMRI')
-                try
-                    RGB = linearizeOutput(RGB,gammaTable);
-                catch
-                    break
-                end
-            end
-            if(any(RGB(:)>255) || any(RGB(:)<0))
-                break
-            end
-            
-        end
-        YRadius = ((Y-incDKLY)- origin(2));
-        incDKLY = (YRadius/60);
-        
-        Y = origin(2);
-        XtoTry =  linspace(origin(1),origin(1)+.04,100); %origin(1) + .04 was experimentally found to fail, and be close to passing
-        incDKLX = (XtoTry(end) - origin(1))/100;
-        
-        for X = XtoTry
-            DKL_coords = [X, Y, luminance];
-            lms = cartDKL2lms(DKL_coords,my_scaling');
-            RGB = lms2rgb(phosphors,fundamentals,lms);
-            if ~strcmp(monitor,'fMRI')
-                try
-                    RGB = linearizeOutput(RGB,gammaTable);
-                catch
-                    break
-                end
-            end
-            if(any(RGB(:)>255) || any(RGB(:)<0))
-                break
-            end
-            
-        end
-        Xradius = (X-incDKLX- origin(1));
-        incDKLX = (Xradius/60);
-    end
-    
         
     thetaInc = 1; %degrees
     
@@ -190,14 +152,12 @@ function [incDKLX, incDKLY, origin, luminance, stepRadius] = findMaxDKLDisc(back
         end      
     end
         
-    saveRadius;
+    %update increments such that stepRadius increments yields max radius 
+    incDKLX = (saveRadius/stepRadius)*incDKLX;
+    incDKLY = (saveRadius/stepRadius)*incDKLY;
     
-    XRadius = saveRadius*incDKLX;
-    YRadius = saveRadius*incDKLY;
-    
-    %update increments according to stepRadius and new x,y radii
-    incDKLX = XRadius./stepRadius;
-    incDKLY = YRadius./stepRadius;
+    XRadius = stepRadius*incDKLX;
+    XRadius = stepRadius*incDKLY;
 
     DKLX = origin(1)-XRadius:incDKLX:origin(1)+XRadius;
     DKLY = origin(2)-YRadius:incDKLY:origin(2)+YRadius;

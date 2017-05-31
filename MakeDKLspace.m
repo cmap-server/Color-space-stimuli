@@ -71,11 +71,11 @@ for dkl_x = DKLX
           Rsurface(count1,count2) = RGB(1);
           Gsurface(count1,count2) = RGB(2);
           Bsurface(count1,count2) = RGB(3);
-          if (dkl_x == origin(1) && dkl_y == origin(2))
-              Rsurface(count1,count2) = 255;
-              Gsurface(count1,count2) = 255;
-              Bsurface(count1,count2) = 255;
-          end
+%           if (dkl_x == origin(1) && dkl_y == origin(2))
+%               Rsurface(count1,count2) = 255;
+%               Gsurface(count1,count2) = 255;
+%               Bsurface(count1,count2) = 255;
+%           end
           if (Rsurface(count1,count2)<0 || Rsurface(count1,count2)>255 || Gsurface(count1,count2)<0 || Gsurface(count1,count2)>255 || Bsurface(count1,count2)<0 || Bsurface(count1,count2)>255)
               if showOnlyValidColors
                   Rsurface(count1,count2) = 0;
