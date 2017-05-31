@@ -1,4 +1,4 @@
-color = 'green';
+color = 'blue';
 
 switch color
     case 'red'
