@@ -6,7 +6,7 @@
 %Updated 3/9/2016
 %Author: Nick Blauch
 
-function [incrMB, incbMB, stepRadius] = findMaxMBDisc(luminance,monitor,plot,runTime,incrMB,incbMB)
+function [incrMB, incbMB, stepRadius,BROKE] = findMaxMBDisc(luminance,monitor,plot,runTime,incrMB,incbMB)
     axisRatio = 80/3; %to produce a square plot in MB space corresponding to square MDS plot (Boehm et. al, 2014).
 
     if nargin<5
@@ -41,10 +41,12 @@ function [incrMB, incbMB, stepRadius] = findMaxMBDisc(luminance,monitor,plot,run
     %%
     %Here we find a first approximation of the maximum radius
     %We test along the negative y-axis, from origin to 0, and use the
-    %radius which produces the first invalid MB point.
+    %radius which produces the first invalid MB point. This produces an
+    %invalid point for the full range of luminances [0,1]
     
     bMBToTry = origin(2):-incbMB:0;
     r = origin(1);
+    BROKE = 0;
     for b = bMBToTry
         rgbMB = [r, 1-r, b];
         lms = rgbMB2lms(rgbMB,luminance,my_scaling');
@@ -53,10 +55,12 @@ function [incrMB, incbMB, stepRadius] = findMaxMBDisc(luminance,monitor,plot,run
             try
                 RGB = linearizeOutput(RGB,gammaTable);
             catch
+                BROKE = 1;
                 break
             end
         end
         if(any(RGB(:)>255) || any(RGB(:)<0))
+            BROKE = 1;
             break
         end
 
