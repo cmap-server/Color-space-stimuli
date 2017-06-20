@@ -3,17 +3,17 @@
 
 %%
 
-angle1 = 270;
-angle2 = 90;
+angle1 = 0;
+angle2 = 180;
 
 
-stimuli1 = load(strcat('fMRI_stimuli_DKL_6deg/T',num2str(angle1),'O90STgrey.mat'));
+stimuli1 = load(strcat('talk_cemnl_stimuli_DKL_6deg/T',num2str(angle1),'O90STgreyshifted.mat'));
 stimuli1 = stimuli1.stimuli;
 
-stimuli2 = load(strcat('fMRI_stimuli_DKL_6deg/T',num2str(angle2),'O90STgrey.mat'));
+stimuli2 = load(strcat('talk_cemnl_stimuli_DKL_6deg/T',num2str(angle2),'O90STgreyshifted.mat'));
 stimuli2 = stimuli2.stimuli;
 
-mov2 = VideoWriter(strcat('1trajectory',num2str(angle1),'to',num2str(angle2),'.avi'));
+mov2 = VideoWriter(strcat('/Volumes/SANDISK/bigtrajectory',num2str(angle1),'to',num2str(angle2),'.avi'));
 mov2.FrameRate = 120;
 
 open(mov2);
@@ -24,6 +24,28 @@ end
 %back to gray
 for i = size(stimuli1,1):-1:1
     writeVideo(mov2,im2frame(squeeze(stimuli1(i,:,:,:)./255)))
+end
+
+for i = 1:size(stimuli1,1)
+    writeVideo(mov2,im2frame(squeeze(stimuli1(i,:,:,:)./255)))
+end
+
+%back to gray
+for i = size(stimuli1,1):-1:1
+    writeVideo(mov2,im2frame(squeeze(stimuli1(i,:,:,:)./255)))
+end
+
+for i = 1:2*size(stimuli2,1)
+    writeVideo(mov2,im2frame(squeeze(stimuli2(1,:,:,:)./255)))
+end
+
+for i = 1:size(stimuli2,1)
+    writeVideo(mov2,im2frame(squeeze(stimuli2(i,:,:,:)./255)))
+end
+
+%back to gray
+for i = size(stimuli2,1):-1:1
+    writeVideo(mov2,im2frame(squeeze(stimuli2(i,:,:,:)./255)))
 end
 
 for i = 1:size(stimuli2,1)

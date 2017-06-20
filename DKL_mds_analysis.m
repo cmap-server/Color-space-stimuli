@@ -1,7 +1,7 @@
 
 cd('/Volumes/SANDISK/UMass/CEMNL/Color space stimuli/')
 addpath('color_toolbox_v1')
-subject = 2;
+subject = 4;
 monitor = 'cemnl';
 
 dkl_coords = [cosd((0:23)*15); sind((0:23)*15)]';

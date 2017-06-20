@@ -4,7 +4,7 @@
 
 clear all
 
-monitor = 'fMRI';
+monitor = 'cemnl';
 stripeType = 'grey';
 runTime = 1; %seconds for out to one color and back, frame rate of 120 hz
 
@@ -15,7 +15,7 @@ if strcmp(monitor,'fMRI')
 elseif strcmp(monitor,'cemnl')
     load extras/phosphors_cemnl
     load extras/scaling_cemnl
-    background_grey = 50;
+    background_grey = 128;
 end
 
 load extras/SMJfundamentals
@@ -36,4 +36,8 @@ for gabor_angle = [90 180]
     end
 end
 
-
+gabor_angle = 90;
+for theta = [ 90, 180, 270]
+            stimuli = generate_one_angle_nav_stimulus_DKL(theta,stepRadius,gabor_angle,incDKLX,incDKLY,background_grey,monitor,phosphors,fundamentals,my_scaling,0);
+            save(strcat('talk_',monitor,'_stimuli_DKL_6deg/','T',num2str(theta),'O',num2str(gabor_angle),'ST',stripeType,'shifted'),'stimuli');
+end

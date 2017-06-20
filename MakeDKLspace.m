@@ -2,7 +2,7 @@
 %Author: Nick Blauch
 %created 3/13/2017 as a model after MakeMBspace
 
-function img = MakeDKLspace(background_grey,monitor,DKLX,DKLY)
+function img = MakeDKLspace(background_grey,monitor,pixel_full_width,DKLX,DKLY)
 
 
 %%
@@ -13,8 +13,12 @@ if ~strcmp(monitor,'fMRI')
 end
 showOnlyValidColors = 1; %one to make non-valid colors black
 showOnlyDisc = 1; %one to black out points outside of disc
-showOnlyAnnulus = 1; %one to black out points inside a thin annulus
-
+showOnlyAnnulus = 0; %one to black out points inside a thin annulus
+if exist pixel_full_width
+    runTime = (pixel_full_width)/120;
+else
+    runTime = 1;
+end
 %-------------------------------------------------------------------------%
 if strcmp(monitor,'cemnl')
     load extras/phosphors_cemnl
@@ -35,8 +39,8 @@ background_dkl = lms2cartDKL(background_lms,my_scaling');
 origin = background_dkl(1:2); %set background chromatic dimensions as origin
 luminance = background_dkl(3);
 
-if nargin<3
-    [incDKLX, incDKLY, origin, luminance, stepRadius] = findMaxDKLDisc(background_grey,monitor,0,1);
+if nargin<4
+    [incDKLX, incDKLY, origin, luminance, stepRadius] = findMaxDKLDisc(background_grey,monitor,0,runTime);
     DKLX = origin(1)-incDKLX*stepRadius:incDKLX:origin(1) + stepRadius*incDKLX;
     DKLY = origin(2)-incDKLY*stepRadius:incDKLY:origin(2) + stepRadius*incDKLY;
 else
